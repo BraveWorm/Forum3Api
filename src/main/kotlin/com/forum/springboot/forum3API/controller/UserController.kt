@@ -15,9 +15,9 @@ class UserController (private val service: UserService) {
     @ResponseStatus(HttpStatus.OK)
     fun getUsers(): Collection<User> = service.getUsers()
 
-//    @PostMapping
-//    @ResponseStatus(HttpStatus.CREATED)
-//    fun postUsers(@RequestBody user: User): User = service.addUser(user)
+    @PostMapping("register")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun postUsers(@RequestBody user: User): User = service.addUser(user)
 //    {
 //        val newUser =  User(null,"Adam", "email@test.com","superPassword")
 //        userRepository.save(newUser)

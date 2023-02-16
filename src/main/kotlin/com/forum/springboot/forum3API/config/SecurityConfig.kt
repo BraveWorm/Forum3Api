@@ -14,10 +14,16 @@ import org.springframework.security.web.SecurityFilterChain
 //import org.springframework.security.crypto.password.PasswordEncoder
 //import org.springframework.security.web.SecurityFilterChain
 
-@Configuration
-@EnableWebSecurity
+//@Configuration
+//@EnableWebSecurity
 class SecurityConfig(){
 
+    @Bean
+    @Throws(java.lang.Exception::class)
+    fun filterChain(http: HttpSecurity): SecurityFilterChain? {
+        http.authorizeRequests().antMatchers("/**").permitAll();
+        return http.build()
+    }
 //    @Autowired
 //    @Throws(Exception::class)
 //    fun configureGlobal(auth: AuthenticationManagerBuilder) {
@@ -39,10 +45,5 @@ class SecurityConfig(){
 //        return http.build()
 //    }
 
-    @Bean
-    @Throws(java.lang.Exception::class)
-    fun filterChain(http: HttpSecurity): SecurityFilterChain? {
-        http.authorizeRequests().antMatchers("/**").permitAll();
-        return http.build()
-    }
+
 }

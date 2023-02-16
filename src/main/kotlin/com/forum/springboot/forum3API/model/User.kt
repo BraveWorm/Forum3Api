@@ -8,18 +8,18 @@ import javax.persistence.Id
 
 
 @Entity
-class User (
+class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    open var id: Long? = null,
+    open var id: Long? = null
 
     @Column(nullable = false)
-    val name:String,
+    val name = ""
 
     @Column(nullable = false, unique = true)
-    val email:String,
+    val email = ""
 
     @Column(nullable = false)
-    val hashedPassword:String,
-)
+    val hashedPassword = ""
+}
