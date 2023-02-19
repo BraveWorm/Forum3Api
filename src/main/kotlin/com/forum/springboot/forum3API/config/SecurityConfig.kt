@@ -18,12 +18,13 @@ import org.springframework.security.web.SecurityFilterChain
 //@EnableWebSecurity
 class SecurityConfig(){
 
-    @Bean
-    @Throws(java.lang.Exception::class)
-    fun filterChain(http: HttpSecurity): SecurityFilterChain? {
-        http.authorizeRequests().antMatchers("/**").permitAll();
-        return http.build()
-    }
+//    @Bean
+//    @Throws(java.lang.Exception::class)
+//    fun filterChain(http: HttpSecurity): SecurityFilterChain? {
+//        http.authorizeRequests().antMatchers("/**").permitAll();
+//        return http.build()
+//    }
+
 //    @Autowired
 //    @Throws(Exception::class)
 //    fun configureGlobal(auth: AuthenticationManagerBuilder) {
