@@ -1,7 +1,9 @@
-package com.forum.springboot.forum3API.controller
+package com.forum.springboot.forum3API.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.forum.springboot.forum3API.model.User
+import com.forum.springboot.forum3API.dtos.UserLoginDTO
+import com.forum.springboot.forum3API.dtos.UserRegisterDTO
+import com.forum.springboot.forum3API.models.User
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -52,7 +54,8 @@ internal class UserControllerTest @Autowired constructor(
         @Test
         fun `should add the new user`() {
             // given
-            val newUser = User(null,"Adam","abc@ww.com","password")
+            val newUser = UserRegisterDTO("Adam","abc@ww.com","password")
+
 
             // when
             val performPost = mockMvc.post(baseUrl) {
@@ -66,7 +69,7 @@ internal class UserControllerTest @Autowired constructor(
                     status { isCreated() }
                     content {
                         contentType(MediaType.APPLICATION_JSON)
-                        json(objectMapper.writeValueAsString(User(1,"Adam","abc@ww.com","password")))
+                        json(objectMapper.writeValueAsString(newUser))
                     }
                 }
         }
