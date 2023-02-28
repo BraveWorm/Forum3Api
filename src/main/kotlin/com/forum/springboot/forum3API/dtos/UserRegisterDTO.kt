@@ -12,7 +12,6 @@ import javax.validation.constraints.Email
 @AutoMapping(UserLoginDTO::class, strategy = AutoMappingStrategy.BY_NAME)
 @DefaultMappingTarget(UserLoginDTO::class)
 class UserRegisterDTO (
-    val name: String? = "",
-    val email: String? = "",
-    val password: String? = ""
+    val email: String,
+    val password: String
         )
