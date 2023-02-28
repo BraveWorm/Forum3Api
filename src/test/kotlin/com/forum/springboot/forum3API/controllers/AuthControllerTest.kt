@@ -1,21 +1,30 @@
 package com.forum.springboot.forum3API.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.forum.springboot.forum3API.dtos.Message
+import com.forum.springboot.forum3API.dtos.UserLoginDTO
 import com.forum.springboot.forum3API.dtos.UserRegisterDTO
-import com.forum.springboot.forum3API.models.User
-import org.junit.jupiter.api.Test
-
+import com.forum.springboot.forum3API.repositorys.UserRepository
+import com.forum.springboot.forum3API.services.UserService
+import dev.krud.shapeshift.dsl.mapper
+import org.aspectj.lang.annotation.Before
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -24,18 +33,24 @@ internal class AuthControllerTest @Autowired constructor(
     val objectMapper: ObjectMapper
 ){
     val baseUrl = "/api/auth"
-    
+
+
+
     @Nested
-    @DisplayName("api/auth/register")
+    @DisplayName("POST api/auth/register")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class Register {
 
 
          @Test
          fun `should register the user`() {
+
              // given
-             //val newUser = UserRegisterDTO("name","email@domain.com","password")
-             val newUser = UserRegisterDTO("name","email@domain.com","password")
+             val newUser = UserRegisterDTO("email@domain.com","password")
+             val expectedJson = "{" +
+                     "\"email\":\"${newUser.email}\"" +
+                     "}"
+
              // when
              val performPost = mockMvc.post("$baseUrl/register") {
                  contentType = MediaType.APPLICATION_JSON
@@ -46,57 +61,38 @@ internal class AuthControllerTest @Autowired constructor(
              performPost.andDo { print() }
                  .andExpect {
                      status { isCreated() }
-                     content {
-                         contentType(MediaType.APPLICATION_JSON)
-                         MockMvcResultMatchers.jsonPath("name",newUser.name)
-                         MockMvcResultMatchers.jsonPath("email",newUser.email)
-                     }
+                     content { json(expectedJson) }
                  }
          }
         
         @Test
         fun `should return BAD REQUEST if user with given email already exists`() {
             // given
-            val newUser = UserRegisterDTO("name","emailAlreadyInUse@domain.com","password")
+            val newUser = UserRegisterDTO("emailAlreadyInUse@domain.com","password")
+            val expectedJson = "{" +
+                    "\"email\":\"${newUser.email}\"" +
+                    "}"
 
             // when
             val performPost = mockMvc.post("$baseUrl/register") {
                 contentType = MediaType.APPLICATION_JSON
                 content = objectMapper.writeValueAsString(newUser)
             }
-            val performPost2 = mockMvc.post("$baseUrl/register") {
-                contentType = MediaType.APPLICATION_JSON
-                content = objectMapper.writeValueAsString(newUser)
-            }
-
-
-
 
             // then
+
             performPost.andDo { print() }
                 .andExpect {
-                    status { isCreated() }
-                    content {
-                        contentType(MediaType.APPLICATION_JSON)
-                        MockMvcResultMatchers.jsonPath("name",newUser.name)
-                        MockMvcResultMatchers.jsonPath("email",newUser.email)
-                    }
-                }
-
-            performPost2.andDo { print() }
-                .andExpect {
                     status { isBadRequest() }
-                    content {
-                        contentType(MediaType.APPLICATION_JSON)
-                        MockMvcResultMatchers.jsonPath("message","email already in use")
-                    }
+                    content { json(objectMapper.writeValueAsString(Message("email already in use"))) }
                 }
         }
 
         @Test
         fun `should return BAD REQUEST if email is invalid`() {
             // given
-            val newUser = UserRegisterDTO("name","invalid email","password")
+            val newUser = UserRegisterDTO("invalid email","password")
+            val expectedJson = "{\"email\":\"invalid email\"}"
 
             // when
             val performPost = mockMvc.post("$baseUrl/register") {
@@ -108,35 +104,106 @@ internal class AuthControllerTest @Autowired constructor(
                 performPost.andDo { print() }
                     .andExpect {
                         status { isBadRequest() }
-                        content {
-                            contentType(MediaType.APPLICATION_JSON)
-                            MockMvcResultMatchers.jsonPath("email","email not valid")
-                        }
+                        content { json( expectedJson ) }
                     }
         }
 
+//        @Test
+//        fun `should return BAD REQUEST if there is no content in request`() {
+//            // given
+//            val noContentUser = "{}"
+//            val expectedJson = "{" +
+//                    "\"email\":\"email can't be Null\"," +
+//                    "\"password\":\"password can't be Null\"" +
+//                    "}"
+//
+//            // when
+//            val performPost = mockMvc.post("$baseUrl/register") {
+//                contentType = MediaType.APPLICATION_JSON
+//                content = noContentUser
+//            }
+//
+//            // then
+//            performPost.andDo { print() }
+//                .andExpect {
+//                    status { isBadRequest() }
+//                    content {
+//                        json( expectedJson )
+//                    }
+//                }
+//        }
+
+    }
+
+    @Nested
+    @DisplayName("POST api/auth/login")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class Login {
+
+
+
         @Test
-        fun `should return BAD REQUEST if data is null`() {
+        fun `should login the user`() {
             // given
-            //val newUser = UserRegisterDTO(null,null,null)
+            val newUser = UserRegisterDTO("newUserForLogin@domain.com","password")
+            val expectedJson = "{\"message\":\"success\"}"
 
             // when
-            val performPost = mockMvc.post("$baseUrl/register") {
+            val performPostLogin = mockMvc.post("$baseUrl/login") {
                 contentType = MediaType.APPLICATION_JSON
-                content = "{}"
+                content = objectMapper.writeValueAsString(newUser)
             }
 
             // then
-            performPost.andDo { print() }
+            performPostLogin.andDo { print() }
                 .andExpect {
-                    status { isBadRequest() }
-                    content {
-                        contentType(MediaType.APPLICATION_JSON)
-                        MockMvcResultMatchers.jsonPath("email","email not valid")
-                        MockMvcResultMatchers.jsonPath("password","password can't be Null")
-                        MockMvcResultMatchers.jsonPath("name","name can't be Null")
-                    }
+                    status { isOk() }
+                    cookie { exists("jwt") }
+                    content { json( expectedJson ) }
                 }
         }
+
+        @Test
+        fun `should return BAD REQUEST when email is wrong`() {
+            // given
+            val userLoginDTO = UserLoginDTO("notExistingEmail@domain.com", "password")
+            val expectedJson = "{\"message\":\"user not found!\"}"
+
+            // when
+            val performPostLogin = mockMvc.post("$baseUrl/login") {
+                contentType = MediaType.APPLICATION_JSON
+                content = objectMapper.writeValueAsString(userLoginDTO)
+            }
+
+            // then
+            performPostLogin.andDo { print() }
+                .andExpect {
+                    status { isBadRequest() }
+                    cookie { doesNotExist("jwt") }
+                    content { json( expectedJson ) }
+                }
+        }
+
+        @Test
+        fun `should return BAD REQUEST when password is wrong`() {
+            // given
+            val userLoginDTO = UserLoginDTO("newUserForLogin@domain.com", "wrongPassword")
+            val expectedJson = "{\"message\":\"invalid password!\"}"
+
+            // when
+            val performPostLogin = mockMvc.post("$baseUrl/login") {
+                contentType = MediaType.APPLICATION_JSON
+                content = objectMapper.writeValueAsString(userLoginDTO)
+            }
+
+            // then
+            performPostLogin.andDo { print() }
+                .andExpect {
+                    status { isBadRequest() }
+                    cookie { doesNotExist("jwt") }
+                    content { json( expectedJson ) }
+                }
+        }
+
     }
 }

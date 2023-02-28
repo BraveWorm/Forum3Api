@@ -2,42 +2,65 @@ package com.forum.springboot.forum3API.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import javax.persistence.Entity
-import javax.persistence.Column
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
+import javax.persistence.*
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotNull
 
 @Entity
-class User() {
+@Table(name="users")
+class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    open var id: Long? = null
-
-
-    @Column(nullable = false)
-    @NotNull(message = "name can't be Null")
-    var name:String? = null
+    @Column(name = "id", nullable = false) var id: Long? = null,
 
     @Column(nullable = false, unique = true)
     @NotNull(message = "email can't be Null")
-    @Email(message = "invalid email")
-    var email: String? = null
+    @Email(message = "invalid email") var email: String? = null,
 
-    @Column(nullable = false)
+    @ManyToOne
+    @JoinColumn private val userRole: UserRole? = null,
+
+    @OneToMany
+    @JoinColumn private val message: MutableList<Message> = mutableListOf(),
+
+    @ManyToMany
+    @JoinTable(
+        name = "user_chat",
+        joinColumns = [JoinColumn()],
+        inverseJoinColumns = [JoinColumn()]
+    )
+    val userChat: MutableList<Chat> = mutableListOf(),
+
+    @ManyToMany
+    @JoinTable(
+        name = "user_therapy_session",
+        joinColumns = [JoinColumn()],
+        inverseJoinColumns = [JoinColumn()]
+    )
+    val userTherapySessions: MutableList<TherapySession> = mutableListOf(),
+) {
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull(message = "password can't be Null")
-    var password: String? = null
+    @Column(nullable = false)
+    var password: String? = ""
         set(value) {
             val passwordEncoder = BCryptPasswordEncoder()
             field = passwordEncoder.encode(value)
         }
 
+    constructor(
+        id: Long?,
+        email: String?,
+        password: String?
+    ) : this() {
+        this.id = id
+        this.email = email
+        this.password = password
+    }
 
     fun comparePassword(password: String): Boolean {
         return BCryptPasswordEncoder().matches(password, this.password)
     }
+
 }

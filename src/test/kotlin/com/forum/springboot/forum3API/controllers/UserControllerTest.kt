@@ -1,9 +1,12 @@
 package com.forum.springboot.forum3API.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.forum.springboot.forum3API.config.NotionConfigProperties
 import com.forum.springboot.forum3API.dtos.UserLoginDTO
 import com.forum.springboot.forum3API.dtos.UserRegisterDTO
 import com.forum.springboot.forum3API.models.User
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -16,6 +19,8 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
+import java.util.*
+import javax.servlet.http.Cookie
 
 
 @SpringBootTest
@@ -28,16 +33,35 @@ internal class UserControllerTest @Autowired constructor(
     val baseUrl = "/api/users"
 
     @Nested
-    @DisplayName("GET /api/users")
+    @DisplayName("GET /api/users/whoami")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    inner class GetUsers {
+    inner class WhoAmI {
 
         @Test
-        fun `should return all users`() {
+        fun `should return all logged user`() {
+            // given
+            val notionConfigProperties = NotionConfigProperties()
 
-            // when/then
-            mockMvc.get(baseUrl)
-                .andDo { print () }
+            val issuer = "1"
+
+            val jwt = Jwts.builder()
+                .setIssuer(issuer)
+                .setExpiration(Date(System.currentTimeMillis() + 1000 * 60 * 60 *24))
+                .signWith(SignatureAlgorithm.HS256, notionConfigProperties.authToken)
+                .compact()
+
+            val cookie = Cookie("jwt", jwt)
+            cookie.isHttpOnly = true
+            cookie.path = "/api/"
+
+            // when
+            val performPostLogin = mockMvc.post("$baseUrl/whoami") {
+                contentType = MediaType.APPLICATION_JSON
+                cookie(cookie)
+            }
+
+            // then
+            performPostLogin.andDo { print() }
                 .andExpect {
                     status { isOk() }
                 }
@@ -45,33 +69,4 @@ internal class UserControllerTest @Autowired constructor(
         }
     }
 
-    @Nested
-    @DisplayName("POST /api/users")
-    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    inner class PostNewUser {
-
-
-        @Test
-        fun `should add the new user`() {
-            // given
-            val newUser = UserRegisterDTO("Adam","abc@ww.com","password")
-
-
-            // when
-            val performPost = mockMvc.post(baseUrl) {
-                contentType = MediaType.APPLICATION_JSON
-                content = objectMapper.writeValueAsString(newUser)
-            }
-
-            // then
-            performPost.andDo { print() }
-                .andExpect {
-                    status { isCreated() }
-                    content {
-                        contentType(MediaType.APPLICATION_JSON)
-                        json(objectMapper.writeValueAsString(newUser))
-                    }
-                }
-        }
-    }
 }

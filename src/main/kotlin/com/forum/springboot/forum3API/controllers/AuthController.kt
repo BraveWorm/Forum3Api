@@ -43,23 +43,6 @@ class AuthController (private val userService: UserService) {
     }
 
 
-
-//    @ExceptionHandler(MethodArgumentNotValidException::class)
-//    fun handleValidationErrors(ex: MethodArgumentNotValidException): Any? {
-//        val errors = ex.bindingResult.fieldErrors
-//            .stream().map { obj: FieldError -> obj.defaultMessage }.collect(Collectors.toList())
-//        return ResponseEntity<Any?>(getErrorsMap(errors as List<String>), HttpHeaders(), HttpStatus.BAD_REQUEST)
-//    }
-//
-//    private fun getErrorsMap(errors: List<String>): Map<String, List<String>>? {
-//        val errorResponse: MutableMap<String, List<String>> = HashMap()
-//        errorResponse["errors"] = errors
-//        return errorResponse
-//    }
-
-
-
-
     @PostMapping("register")
     @ResponseStatus(HttpStatus.CREATED)
     fun register(@Valid @RequestBody  body: User): Any {
