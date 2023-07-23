@@ -1,15 +1,10 @@
 package com.forum.springboot.forum3API.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.forum.springboot.forum3API.dtos.Message
+import com.forum.springboot.forum3API.dtos.ResponseMessage
 import com.forum.springboot.forum3API.dtos.UserLoginDTO
 import com.forum.springboot.forum3API.dtos.UserRegisterDTO
-import com.forum.springboot.forum3API.repositorys.UserRepository
-import com.forum.springboot.forum3API.services.UserService
-import dev.krud.shapeshift.dsl.mapper
-import org.aspectj.lang.annotation.Before
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -18,12 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
 
 
 @SpringBootTest
@@ -84,15 +75,17 @@ internal class AuthControllerTest @Autowired constructor(
             performPost.andDo { print() }
                 .andExpect {
                     status { isBadRequest() }
-                    content { json(objectMapper.writeValueAsString(Message("email already in use"))) }
+                    content { json(objectMapper.writeValueAsString(ResponseMessage("email already in use"))) }
                 }
         }
 
         @Test
         fun `should return BAD REQUEST if email is invalid`() {
             // given
-            val newUser = UserRegisterDTO("invalid email","password")
-            val expectedJson = "{\"email\":\"invalid email\"}"
+            val newUser = UserRegisterDTO(
+                "invalid email",
+                "password")
+            val expectedJson = "{\"message\":\"invalid email\"}"
 
             // when
             val performPost = mockMvc.post("$baseUrl/register") {

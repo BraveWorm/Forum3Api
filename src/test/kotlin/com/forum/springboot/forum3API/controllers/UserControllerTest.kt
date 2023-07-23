@@ -55,7 +55,7 @@ internal class UserControllerTest @Autowired constructor(
             cookie.path = "/api/"
 
             // when
-            val performPostLogin = mockMvc.post("$baseUrl/whoami") {
+            val performPostLogin = mockMvc.get("$baseUrl/whoami") {
                 contentType = MediaType.APPLICATION_JSON
                 cookie(cookie)
             }

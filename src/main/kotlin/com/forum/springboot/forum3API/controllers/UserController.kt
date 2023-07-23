@@ -2,7 +2,7 @@ package com.forum.springboot.forum3API.controllers
 
 
 import com.forum.springboot.forum3API.config.NotionConfigProperties
-import com.forum.springboot.forum3API.dtos.Message
+import com.forum.springboot.forum3API.dtos.ResponseMessage
 import com.forum.springboot.forum3API.models.User
 import com.forum.springboot.forum3API.services.UserService
 import io.jsonwebtoken.Jwts
@@ -24,13 +24,13 @@ class UserController (private val userService: UserService) {
         try {
 
             if(jwt == null)
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Message("unauthenticated"))
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseMessage("unauthenticated"))
 
             val body = Jwts.parser().setSigningKey(notionConfigProperties.authToken).parseClaimsJws(jwt).body
 
             return ResponseEntity.ok(this.userService.getById(body.issuer.toLong()))
         } catch (e: Exception) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Message("unauthenticated"))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseMessage("unauthenticated"))
         }
     }
 

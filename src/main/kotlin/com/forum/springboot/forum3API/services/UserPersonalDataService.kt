@@ -1,5 +1,6 @@
 package com.forum.springboot.forum3API.services
 
+import com.forum.springboot.forum3API.models.User
 import com.forum.springboot.forum3API.models.UserPersonalData
 import com.forum.springboot.forum3API.repositorys.UserPersonalDataRepository
 import org.springframework.stereotype.Service
@@ -12,5 +13,9 @@ class UserPersonalDataService (private val userPersonalDataRepository: UserPerso
 
     fun getByUserId(id: Long): UserPersonalData? {
         return this.userPersonalDataRepository.findByUserId(id)
+    }
+
+    fun save(userPersonalData: UserPersonalData): UserPersonalData? {
+        return this.userPersonalDataRepository.save(userPersonalData)
     }
 }
