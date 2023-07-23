@@ -1,14 +1,13 @@
 package com.forum.springboot.forum3API.controllers
 
 import com.forum.springboot.forum3API.config.NotionConfigProperties
-import com.forum.springboot.forum3API.dtos.Message
+import com.forum.springboot.forum3API.dtos.ResponseMessage
 import com.forum.springboot.forum3API.dtos.UserLoginDTO
-import com.forum.springboot.forum3API.dtos.UserRegisterDTO
 import com.forum.springboot.forum3API.models.User
 import com.forum.springboot.forum3API.services.UserService
-import dev.krud.shapeshift.ShapeShiftBuilder
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import org.hibernate.validator.internal.util.Contracts.assertTrue
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.FieldError
@@ -17,6 +16,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.*
 import java.util.*
 import java.util.function.Consumer
+import java.util.regex.Pattern
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
@@ -42,29 +42,34 @@ class AuthController (private val userService: UserService) {
         return errors
     }
 
-
     @PostMapping("register")
     @ResponseStatus(HttpStatus.CREATED)
     fun register(@Valid @RequestBody  body: User): Any {
         if (body.email?.let { this.userService.findByEmail(it) } != null)
-            return ResponseEntity.badRequest().body(Message("email already in use"))
-
+            return ResponseEntity.badRequest().body(ResponseMessage("email already in use"))
+        val regexPattern = "^(.+)@(\\S+)$"
+        if(userService.emailPatternMatches(body.email, regexPattern))
+            return this.userService.save(body)
 //        val user = User()
 //        user.email = body.email
 //        user.name = body.name
 //        user.password = body.password
 
-        return this.userService.save(body)
+        return ResponseEntity.badRequest().body(ResponseMessage("invalid email"))
     }
-
+    fun patternMatches(emailAddress: String?, regexPattern: String?): Boolean {
+        return Pattern.compile(regexPattern)
+            .matcher(emailAddress)
+            .matches()
+    }
     @PostMapping("login")
     @ResponseStatus(HttpStatus.CREATED)
     fun login(@RequestBody body: UserLoginDTO, response: HttpServletResponse): ResponseEntity<Any> {
         val user = this.userService.findByEmail(body.email)
-            ?: return ResponseEntity.badRequest().body(Message("user not found!"))
+            ?: return ResponseEntity.badRequest().body(ResponseMessage("user not found!"))
 
         if(!user.comparePassword(body.password)){
-            return ResponseEntity.badRequest().body(Message("invalid password!"))
+            return ResponseEntity.badRequest().body(ResponseMessage("invalid password!"))
         }
 
         val issuer = user.id.toString()
@@ -81,7 +86,7 @@ class AuthController (private val userService: UserService) {
 
         response.addCookie(cookie)
 
-        return ResponseEntity.ok(Message("success"))
+        return ResponseEntity.ok(ResponseMessage("success"))
     }
 
 
@@ -93,7 +98,7 @@ class AuthController (private val userService: UserService) {
 
         response.addCookie(cookie)
 
-        return ResponseEntity.ok(Message("success"))
+        return ResponseEntity.ok(ResponseMessage("success"))
     }
 
 }

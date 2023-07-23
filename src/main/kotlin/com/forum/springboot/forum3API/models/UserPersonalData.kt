@@ -1,8 +1,12 @@
 package com.forum.springboot.forum3API.models
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.forum.springboot.forum3API.services.UserService
 import java.time.LocalDate
+import java.util.*
 import javax.persistence.*
+
 
 @Entity
 class UserPersonalData(
@@ -16,5 +20,9 @@ class UserPersonalData(
     @Column()
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd") var dateOfBirth: LocalDate?,
     @Column() var gender: String?,
-    @OneToOne var user: User
+
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @OneToOne
+    @JoinColumn
+    var user: User,
 )

@@ -17,20 +17,6 @@ class User(
     @NotNull(message = "email can't be Null")
     @Email(message = "invalid email") var email: String? = null,
 
-    @ManyToOne
-    @JoinColumn private val userRole: UserRole? = null,
-
-    @OneToMany
-    @JoinColumn private val message: MutableList<Message> = mutableListOf(),
-
-    @ManyToMany
-    @JoinTable(
-        name = "user_chat",
-        joinColumns = [JoinColumn()],
-        inverseJoinColumns = [JoinColumn()]
-    )
-    val userChat: MutableList<Chat> = mutableListOf(),
-
     @ManyToMany
     @JoinTable(
         name = "user_therapy_session",
