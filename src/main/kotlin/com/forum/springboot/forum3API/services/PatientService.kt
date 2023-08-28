@@ -10,4 +10,8 @@ class PatientService(private val patientRepository: PatientRepository) {
     fun save(patient: Patient): Patient{
         return this.patientRepository.save(patient)
     }
+
+    fun getByUserId(userId: Long): Patient? {
+        return this.patientRepository.findByUserId(userId)
+    }
 }

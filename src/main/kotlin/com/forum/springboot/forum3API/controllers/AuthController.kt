@@ -57,11 +57,13 @@ class AuthController (private val userService: UserService) {
 
         return ResponseEntity.badRequest().body(ResponseMessage("invalid email"))
     }
+
     fun patternMatches(emailAddress: String?, regexPattern: String?): Boolean {
         return Pattern.compile(regexPattern)
             .matcher(emailAddress)
             .matches()
     }
+
     @PostMapping("login")
     @ResponseStatus(HttpStatus.CREATED)
     fun login(@RequestBody body: UserLoginDTO, response: HttpServletResponse): ResponseEntity<Any> {

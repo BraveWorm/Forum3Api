@@ -2,7 +2,7 @@ package com.forum.springboot.forum3API.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.forum.springboot.forum3API.config.NotionConfigProperties
-import com.forum.springboot.forum3API.dtos.UserPersonalDataDTO
+import com.forum.springboot.forum3API.dtos.PatientDTO
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.junit.jupiter.api.Assertions.*
@@ -17,18 +17,16 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
-import java.time.LocalDate
 import java.util.*
 import javax.servlet.http.Cookie
 
 @SpringBootTest
 @AutoConfigureMockMvc
-internal class UserPersonalDataControllerTest @Autowired constructor(
+internal class PatientControllerTest @Autowired constructor(
     val mockMvc: MockMvc,
     val objectMapper: ObjectMapper
 ){
-    val baseUrl = "/api/userpersonaldata"
-    // creating cookie/logging in
+    val baseUrl = "/api/patient"
     fun createJWT(issuer: String): Cookie {
         val notionConfigProperties = NotionConfigProperties()
         val jwt = Jwts.builder()
@@ -40,35 +38,28 @@ internal class UserPersonalDataControllerTest @Autowired constructor(
     }
 
     @Nested
-    @DisplayName("POST api/userpersonaldata")
+    @DisplayName("POST api/patient")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    inner class  AddUserPersonalData {
-
-
+    inner class AddPatient {
         @Test
-        fun `should create UserPersonalData and return isCreated = true`() {
+        fun `should create Patient and return isCreated = true`() {
             // given
             // creating cookie/logging in
             val cookie = createJWT("3")
             cookie.isHttpOnly = true
             cookie.path = "/api/"
 
-            val newUserPersonalDataDTO = UserPersonalDataDTO(
+            val newPatientDTO = PatientDTO(
                 null,
-                "firstNameTest",
-                null,
-                "lastNameTest",
-                "987456321",
-                LocalDate.of(1993, 10, 13),
-                "genderTest",
+                "healthProblems",
+                "therapeuticRequirements",
                 3
             )
             val expectedJson = "{\"isCreated\": true}"
-
             // when
             val performPost = mockMvc.post(baseUrl) {
                 contentType = MediaType.APPLICATION_JSON
-                content = objectMapper.writeValueAsString(newUserPersonalDataDTO)
+                content = objectMapper.writeValueAsString(newPatientDTO)
                 cookie(cookie)
             }
 
@@ -80,57 +71,24 @@ internal class UserPersonalDataControllerTest @Autowired constructor(
                 }
         }
 
-
         @Test
-        fun `should return Bad Request if there is no cookie`() {
+        fun `should return INTERNAL_SERVER_ERROR if Patient already exist in DB`() {
             // given
+            // creating cookie/logging in
+            val cookie = createJWT("1")
+            cookie.isHttpOnly = true
+            cookie.path = "/api/"
 
-            val newUserPersonalDataDTO = UserPersonalDataDTO(
+            val newPatientDTO = PatientDTO(
                 null,
-                "firstNameTest",
-                null,
-                "lastNameTest",
-                "987456321",
-                LocalDate.of(1993, 10, 13),
-                "genderTest",
+                "healthProblems",
+                "therapeuticRequirements",
                 1
             )
             // when
             val performPost = mockMvc.post(baseUrl) {
                 contentType = MediaType.APPLICATION_JSON
-                content = objectMapper.writeValueAsString(newUserPersonalDataDTO)
-            }
-
-            // then
-            performPost.andDo { print() }
-                .andExpect {
-                    status { isBadRequest() }
-                }
-        }
-
-        @Test
-        fun `should return INTERNAL_SERVER_ERROR if UserPersonalData already exist in DB`() {
-            // given
-            // creating cookie/logging in
-            val cookie = createJWT("4")
-            cookie.isHttpOnly = true
-            cookie.path = "/api/"
-
-            val newUserPersonalDataDTO = UserPersonalDataDTO(
-                null,
-                "firstNameTest",
-                null,
-                "lastNameTest",
-                "987456321",
-                LocalDate.of(1993, 10, 13),
-                "genderTest",
-                4
-            )
-
-            // when
-            val performPost = mockMvc.post(baseUrl) {
-                contentType = MediaType.APPLICATION_JSON
-                content = objectMapper.writeValueAsString(newUserPersonalDataDTO)
+                content = objectMapper.writeValueAsString(newPatientDTO)
                 cookie(cookie)
             }
 
@@ -140,48 +98,43 @@ internal class UserPersonalDataControllerTest @Autowired constructor(
                     status { isInternalServerError() }
                 }
         }
-
     }
-    
+
     @Nested
-    @DisplayName("PUT api/userpersonaldata")
+    @DisplayName("PUT api/patient")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    inner class ChangeUserPersonalData {
-        @Test
-        fun `should change UserPersonalData and return status OK`() {
-            // given
-            // creating cookie/logging in
-            val cookie = createJWT("4")
-            cookie.isHttpOnly = true
-            cookie.path = "/api/"
+    inner class ChangePatient {
+            @Test
+            fun `should should change Patient and return status OK`() {
+                // given
+                // creating cookie/logging in
+                val cookie = createJWT("4")
+                cookie.isHttpOnly = true
+                cookie.path = "/api/"
 
-            val newUserPersonalDataDTO = UserPersonalDataDTO(
-                null,
-                "newFirstNameTest",
-                null,
-                "newLastNameTest",
-                "123456789",
-                LocalDate.of(1994, 11, 14),
-                "newGenderTest",
-                4
-            )
+                // when
+                val newPatientDTO = PatientDTO(
+                    null,
+                    "newHealthProblems",
+                    "newTherapeuticRequirements",
+                    4
+                )
 
-            // when
-            val performPost = mockMvc.put(baseUrl) {
-                contentType = MediaType.APPLICATION_JSON
-                content = objectMapper.writeValueAsString(newUserPersonalDataDTO)
-                cookie(cookie)
+                val performPost = mockMvc.put(baseUrl) {
+                    contentType = MediaType.APPLICATION_JSON
+                    content = objectMapper.writeValueAsString(newPatientDTO)
+                    cookie(cookie)
+                }
+
+                // then
+                performPost.andDo { print() }
+                    .andExpect {
+                        status { isOk() }
+                    }
             }
 
-            // then
-            performPost.andDo { print() }
-                .andExpect {
-                    status { isOk() }
-                }
-        }
-
         @Test
-        fun `should return BAD_REQUEST if there is no UserPersonalData in request`() {
+        fun `should return BAD_REQUEST if there is no Patient in request`() {
             // given
             // creating cookie/logging in
             val cookie = createJWT("4")
@@ -202,4 +155,5 @@ internal class UserPersonalDataControllerTest @Autowired constructor(
         }
 
     }
+
 }

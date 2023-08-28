@@ -27,7 +27,7 @@ class UserController (private val userService: UserService) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseMessage("unauthenticated"))
 
             val body = Jwts.parser().setSigningKey(notionConfigProperties.authToken).parseClaimsJws(jwt).body
-
+            val temp = this.userService.getById(body.issuer.toLong())
             return ResponseEntity.ok(this.userService.getById(body.issuer.toLong()))
         } catch (e: Exception) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseMessage("unauthenticated"))
@@ -51,9 +51,5 @@ class UserController (private val userService: UserService) {
 //        val userDatasource = UserDatasource(userService)
 //        userDatasource.addUsersToDB()
 //    }
-
-
-
-
 
 }

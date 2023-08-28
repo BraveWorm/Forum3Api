@@ -23,6 +23,6 @@ class UserPersonalData(
 
 //    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToOne
-    @JoinColumn
+    @JoinColumn(name = "user_id", referencedColumnName = "id", unique=true)
     var user: User,
 )

@@ -101,31 +101,6 @@ internal class AuthControllerTest @Autowired constructor(
                     }
         }
 
-//        @Test
-//        fun `should return BAD REQUEST if there is no content in request`() {
-//            // given
-//            val noContentUser = "{}"
-//            val expectedJson = "{" +
-//                    "\"email\":\"email can't be Null\"," +
-//                    "\"password\":\"password can't be Null\"" +
-//                    "}"
-//
-//            // when
-//            val performPost = mockMvc.post("$baseUrl/register") {
-//                contentType = MediaType.APPLICATION_JSON
-//                content = noContentUser
-//            }
-//
-//            // then
-//            performPost.andDo { print() }
-//                .andExpect {
-//                    status { isBadRequest() }
-//                    content {
-//                        json( expectedJson )
-//                    }
-//                }
-//        }
-
     }
 
     @Nested
