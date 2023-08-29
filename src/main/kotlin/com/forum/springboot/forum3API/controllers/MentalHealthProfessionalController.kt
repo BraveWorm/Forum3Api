@@ -52,7 +52,6 @@ class MentalHealthProfessionalController(
             println(e)
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseMessage("INTERNAL_SERVER_ERROR"))
         }
-
     }
 
 }
