@@ -36,7 +36,7 @@ class PatientController (private val patientService: PatientService,
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    fun putUserPersonalData(@CookieValue("jwt") jwt: String, @RequestBody body: PatientDTO): Any? {
+    fun putPatient(@CookieValue("jwt") jwt: String, @RequestBody body: PatientDTO): Any? {
         return try {
             val userId = Jwts.parser().setSigningKey(notionConfigProperties.authToken).parseClaimsJws(jwt).body.issuer.toLong()
             body.userID = userId
@@ -51,4 +51,33 @@ class PatientController (private val patientService: PatientService,
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseMessage("INTERNAL_SERVER_ERROR"))
         }
     }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    fun getPatient(@CookieValue("jwt") jwt: String): Any? {
+        return try {
+            val userId = Jwts.parser().setSigningKey(notionConfigProperties.authToken).parseClaimsJws(jwt).body.issuer.toLong()
+            return patientService.getByUserId(userId)?.mapPatientToPatientDTO()
+
+
+        } catch (e: Exception) {
+            println(e)
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseMessage("INTERNAL_SERVER_ERROR"))
+        }
+    }
+//    @GetMapping("/{patient}")
+//    @ResponseStatus(HttpStatus.OK)
+//    fun getPatientById(@CookieValue("jwt") jwt: String, @PathVariable patient: Long): Any? {
+//        return try {
+//            val userId = Jwts.parser().setSigningKey(notionConfigProperties.authToken).parseClaimsJws(jwt).body.issuer.toLong()
+//
+//            "{\"isCreated\": true}"
+//
+//        } catch (e: Exception) {
+//            println(e)
+//            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseMessage("INTERNAL_SERVER_ERROR"))
+//        }
+//    }
+
+
 }

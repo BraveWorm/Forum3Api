@@ -7,11 +7,11 @@ import dev.krud.shapeshift.resolver.annotation.AutoMapping
 
 
 @AutoMapping(Patient::class, strategy = AutoMappingStrategy.BY_NAME)
-class PatientDTO (
+class PatientDTO(
     var id: Long?,
     val healthProblems: String?,
     val therapeuticRequirements: String?,
-    var userID: Long,
+    var userID: Long?,
 ) {
     fun mapPatientDTOToPatient( userService: UserService ): Patient {
         return Patient(

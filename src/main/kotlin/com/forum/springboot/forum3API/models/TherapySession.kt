@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonManagedReference
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
 
@@ -16,10 +17,10 @@ class TherapySession(
     @Column() var status: String? = null,
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
-    @Column() var startOfTherapySession: LocalDate? = null,
+    @Column() var startOfTherapySession: LocalDateTime? = null,
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
-    @Column() var endOfTherapySession: LocalDate? = null,
+    @Column() var endOfTherapySession: LocalDateTime? = null,
 
 //    @ManyToMany(mappedBy = "userTherapySessions")
 //    val userTherapySession: MutableList<User> = mutableListOf()
@@ -28,8 +29,8 @@ class TherapySession(
     @JsonBackReference
     @JoinTable(
         name = "user_therapy_session",
-        joinColumns = [JoinColumn(name= "user_id")],
-        inverseJoinColumns = [JoinColumn(name = "therapy_session_id")]
+        joinColumns = [JoinColumn(name= "therapy_session_id")],
+        inverseJoinColumns = [JoinColumn(name = "user_id")]
     )
     val userTherapySessions: MutableList<User> = mutableListOf(),
 )

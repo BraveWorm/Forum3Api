@@ -63,4 +63,5 @@ class UserPersonalDataController (private val userPersonalDataService: UserPerso
         }
     }
 
+    /* TODO GetMapping*/
 }

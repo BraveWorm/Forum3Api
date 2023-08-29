@@ -1,18 +1,13 @@
 package com.forum.springboot.forum3API.dataloader.db
 
-import com.forum.springboot.forum3API.models.Patient
-import com.forum.springboot.forum3API.models.TherapySession
-import com.forum.springboot.forum3API.models.User
-import com.forum.springboot.forum3API.models.UserPersonalData
-import com.forum.springboot.forum3API.services.PatientService
-import com.forum.springboot.forum3API.services.TherapySessionService
-import com.forum.springboot.forum3API.services.UserPersonalDataService
-import com.forum.springboot.forum3API.services.UserService
+import com.forum.springboot.forum3API.models.*
+import com.forum.springboot.forum3API.services.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.stereotype.Component
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 const val ANSI_RED = "\u001B[31m"
 const val ANSI_CYAN = "\u001B[36m"
@@ -23,7 +18,7 @@ class DataLoader @Autowired constructor(
     private val userPersonalDataService: UserPersonalDataService,
     private val userPatientService: PatientService,
     private val therapySessionService: TherapySessionService,
-    //private val userRoleService: UserRoleService,
+    private val mentalHealthProfessionalService: MentalHealthProfessionalService,
     ) : ApplicationRunner {
     override fun run(args: ApplicationArguments) {
 
@@ -68,26 +63,42 @@ class DataLoader @Autowired constructor(
         ))
 
 
-        val list: MutableList<User> = mutableListOf( userService.getById(1),userService.getById(2) )
-//        therapySessionService.save(TherapySession(
-//            null,
-//            "status",
-//            LocalDate.of(2022,10,10),
-//            LocalDate.of(2022,10,11),
-//            list
-//        ))
-        val therapySession = TherapySession(
+        therapySessionService.save(
+            TherapySession(
             null,
             "status",
-            LocalDate.of(2022,10,10),
-            LocalDate.of(2022,10,11),
-            list
+            LocalDateTime.of(2022,10,11,12,0,0),
+            LocalDateTime.of(2022,10,11,13,0,0),
+            mutableListOf( userService.getById(1),userService.getById(2) )
+        ))
+
+        therapySessionService.save(
+            TherapySession(
+                null,
+                "status",
+                LocalDateTime.of(2022,10,12,12,0,0),
+                LocalDateTime.of(2022,10,12,13,0,0),
+                mutableListOf( userService.getById(1),userService.getById(2))
+            )
         )
-        therapySessionService.save(therapySession)
-//        user.userTherapySessions.add(therapySession)
-//        userService.save(user)
 
+//        mentalHealthProfessionalService.save(
+//            MentalHealthProfessional(
+//                null,
+//                "specialization",
+//                100.00,
+//                userService.getById(3)
+//            )
+//        )
 
+        mentalHealthProfessionalService.save(
+            MentalHealthProfessional(
+                null,
+                "specialization",
+                150.00,
+                userService.getById(4)
+            )
+        )
 
         println(ANSI_CYAN + "Loading data completed" + ANSI_RESET)
     }
