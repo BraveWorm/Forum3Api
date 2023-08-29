@@ -10,4 +10,8 @@ class MentalHealthProfessionalService(private val mentalHealthProfessionalReposi
     fun save(mentalHealthProfessional: MentalHealthProfessional): MentalHealthProfessional {
         return this.mentalHealthProfessionalRepository.save(mentalHealthProfessional)
     }
+
+    fun getByUserId(userId: Long): MentalHealthProfessional? {
+        return this.mentalHealthProfessionalRepository.findByUserId(userId)
+    }
 }

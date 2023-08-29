@@ -1,5 +1,6 @@
 package com.forum.springboot.forum3API.models
 
+import com.fasterxml.jackson.annotation.JsonBackReference
 import javax.persistence.*
 
 @Entity
@@ -12,5 +13,8 @@ class MentalHealthProfessional(
 
     @Column() var hourlyRate: Double? = null,
 
-    @OneToOne var user: User
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id", unique=true)
+    @JsonBackReference
+    var user: User
 )

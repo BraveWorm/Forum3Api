@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 import java.util.*
@@ -105,7 +106,7 @@ internal class PatientControllerTest @Autowired constructor(
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class ChangePatient {
             @Test
-            fun `should should change Patient and return status OK`() {
+            fun `should change Patient and return status OK`() {
                 // given
                 // creating cookie/logging in
                 val cookie = createJWT("4")
@@ -154,6 +155,46 @@ internal class PatientControllerTest @Autowired constructor(
                 }
         }
 
+    }
+    @Nested
+    @DisplayName("GET  api/patient")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class GetPatient {
+        @Test
+        fun `should get Patient and return status OK`() {
+            // given
+            val cookie = createJWT("1")
+            cookie.isHttpOnly = true
+            cookie.path = "/api/"
+            
+            // when
+            val performPost = mockMvc.get(baseUrl) {
+                contentType = MediaType.APPLICATION_JSON
+                cookie(cookie)
+            }
+            
+            // then
+            performPost.andDo { print() }
+                .andExpect {
+                    status { isOk() }
+                }
+        }
+
+        @Test
+        fun `should return BAD_REQUEST if there is no Patient in request`() {
+            // given
+
+
+            // when
+            val performPost = mockMvc.get(baseUrl) {
+                contentType = MediaType.APPLICATION_JSON
+                }
+            // then
+                performPost.andDo { print() }
+                    .andExpect {
+                        status { isBadRequest() }
+                    }
+        }
     }
 
 }
