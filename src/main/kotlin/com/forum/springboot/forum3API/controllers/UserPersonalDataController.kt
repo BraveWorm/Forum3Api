@@ -63,5 +63,15 @@ class UserPersonalDataController (private val userPersonalDataService: UserPerso
         }
     }
 
-    /* TODO GetMapping*/
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    fun getUserPersonalData(@CookieValue("jwt") jwt: String): Any? {
+        return try {
+            val userId = Jwts.parser().setSigningKey(notionConfigProperties.authToken).parseClaimsJws(jwt).body.issuer.toLong()
+            return  userPersonalDataService.getByUserId(userId)?.mapUserPersonalDataToUserPersonalDataDTO()
+        } catch (e: Exception) {
+            println(e)
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseMessage("INTERNAL_SERVER_ERROR"))
+        }
+    }
 }

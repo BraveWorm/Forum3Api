@@ -38,7 +38,7 @@ class MentalHealthProfessionalController(
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    fun putUserPersonalData(@CookieValue("jwt") jwt: String, @RequestBody body: MentalHealthProfessionalDTO): Any? {
+    fun putMentalHealthProfessional(@CookieValue("jwt") jwt: String, @RequestBody body: MentalHealthProfessionalDTO): Any? {
         return try {
             val userId = Jwts.parser().setSigningKey(notionConfigProperties.authToken).parseClaimsJws(jwt).body.issuer.toLong()
             body.userID = userId
@@ -53,6 +53,31 @@ class MentalHealthProfessionalController(
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseMessage("INTERNAL_SERVER_ERROR"))
         }
 
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    fun getMentalHealthProfessional(@CookieValue("jwt") jwt: String): Any? {
+        return try {
+            val userId = Jwts.parser().setSigningKey(notionConfigProperties.authToken).parseClaimsJws(jwt).body.issuer.toLong()
+            return mentalHealthProfessionalService.getByUserId(userId)?.mapMentalHealthProfessionalToMentalHealthProfessionalDTO()
+
+        } catch (e: Exception) {
+            println(e)
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseMessage("INTERNAL_SERVER_ERROR"))
+        }
+    }
+
+    @GetMapping("/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    fun getMentalHealthProfessionalByUserId (@PathVariable userId: Long): Any? {
+        return try {
+            return mentalHealthProfessionalService.getByUserId(userId)?.mapMentalHealthProfessionalToMentalHealthProfessionalDTO()
+
+        } catch (e: Exception) {
+            println(e)
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseMessage("INTERNAL_SERVER_ERROR"))
+        }
     }
 
 }
