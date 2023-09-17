@@ -16,7 +16,7 @@ class UserPersonalDataDTO (
     var phoneNumber: String?,
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd") var dateOfBirth: LocalDate?,
     var gender: String,
-    var userID: Long,
+    var userID: Long?,
 ) {
     fun mapUserPersonalDataDTOToUserPersonalData( userService: UserService): UserPersonalData {
         return UserPersonalData(

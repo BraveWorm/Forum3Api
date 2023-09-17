@@ -25,8 +25,17 @@ class UserService ( private val userRepository: UserRepository){
     }
 
     fun getById(id: Long?): User {
-        if (id == null) throw IllegalArgumentException("param cannot be null.");
+        if (id == null) throw IllegalArgumentException("param cannot be null.")
         return this.userRepository.getById(id)
+    }
+
+    fun getByMutableListOfIds(mutableListOfIds: MutableList<Long?>): MutableList<User> {
+        val mutableListOfUser = arrayListOf<User>()
+        mutableListOfIds.forEach {
+            if (it == null) throw IllegalArgumentException("param cannot be null.");
+            mutableListOfUser.add(this.userRepository.getById(it))
+        }
+        return mutableListOfUser
     }
 
     fun isEmailValid(@Email email: String): Boolean {

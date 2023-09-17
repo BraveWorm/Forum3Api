@@ -10,7 +10,7 @@ class MentalHealthProfessionalDTO(
     var id: Long?,
     val specialization: String?,
     val hourlyRate: Double?,
-    var userID: Long,
+    var userID: Long?,
 ) {
     fun mapMentalHealthProfessionalDTOToMentalHealthProfessional( userService: UserService): MentalHealthProfessional {
         return MentalHealthProfessional(

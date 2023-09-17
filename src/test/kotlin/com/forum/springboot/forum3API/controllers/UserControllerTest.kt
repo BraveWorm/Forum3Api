@@ -55,13 +55,13 @@ internal class UserControllerTest @Autowired constructor(
             cookie.path = "/api/"
 
             // when
-            val performPostLogin = mockMvc.get("$baseUrl/whoami") {
+            val performGet = mockMvc.get("$baseUrl/whoami") {
                 contentType = MediaType.APPLICATION_JSON
                 cookie(cookie)
             }
 
             // then
-            performPostLogin.andDo { print() }
+            performGet.andDo { print() }
                 .andExpect {
                     status { isOk() }
                 }

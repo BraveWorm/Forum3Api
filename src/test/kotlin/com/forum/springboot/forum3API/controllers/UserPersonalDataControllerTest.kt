@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 import java.time.LocalDate
@@ -167,14 +168,14 @@ internal class UserPersonalDataControllerTest @Autowired constructor(
             )
 
             // when
-            val performPost = mockMvc.put(baseUrl) {
+            val performPut = mockMvc.put(baseUrl) {
                 contentType = MediaType.APPLICATION_JSON
                 content = objectMapper.writeValueAsString(newUserPersonalDataDTO)
                 cookie(cookie)
             }
 
             // then
-            performPost.andDo { print() }
+            performPut.andDo { print() }
                 .andExpect {
                     status { isOk() }
                 }
@@ -189,17 +190,59 @@ internal class UserPersonalDataControllerTest @Autowired constructor(
             cookie.path = "/api/"
 
             // when
-            val performPost = mockMvc.put(baseUrl) {
+            val performPut = mockMvc.put(baseUrl) {
                 contentType = MediaType.APPLICATION_JSON
                 cookie(cookie)
             }
 
             // then
-            performPost.andDo { print() }
+            performPut.andDo { print() }
                 .andExpect {
                     status { isBadRequest() }
                 }
         }
-
     }
+    
+    @Nested
+    @DisplayName("GET api/userpersonaldata")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class GetUserPersonalData {    
+        @Test
+        fun `should get UserPersonalData and return status OK`() {
+            // given
+            val cookie = createJWT("1")
+            cookie.isHttpOnly = true
+            cookie.path = "/api/"
+            
+            // when
+            val performGet = mockMvc.get(baseUrl) {
+                contentType = MediaType.APPLICATION_JSON
+                cookie(cookie)
+            }
+            
+            // then
+            performGet.andDo { print() }
+                .andExpect {
+                    status { isOk() }
+                }
+        }
+
+        @Test
+        fun `should return BAD_REQUEST if there is no Cookie in request`() {
+            // given
+
+
+            // when
+            val performGet = mockMvc.get(baseUrl) {
+                contentType = MediaType.APPLICATION_JSON
+            }
+
+            // then
+            performGet.andDo { print() }
+                .andExpect {
+                    status { isBadRequest() }
+                }
+        }
+    }
+    
 }

@@ -121,14 +121,14 @@ internal class PatientControllerTest @Autowired constructor(
                     4
                 )
 
-                val performPost = mockMvc.put(baseUrl) {
+                val performPut = mockMvc.put(baseUrl) {
                     contentType = MediaType.APPLICATION_JSON
                     content = objectMapper.writeValueAsString(newPatientDTO)
                     cookie(cookie)
                 }
 
                 // then
-                performPost.andDo { print() }
+                performPut.andDo { print() }
                     .andExpect {
                         status { isOk() }
                     }
@@ -143,13 +143,13 @@ internal class PatientControllerTest @Autowired constructor(
             cookie.path = "/api/"
 
             // when
-            val performPost = mockMvc.put(baseUrl) {
+            val performPut = mockMvc.put(baseUrl) {
                 contentType = MediaType.APPLICATION_JSON
                 cookie(cookie)
             }
 
             // then
-            performPost.andDo { print() }
+            performPut.andDo { print() }
                 .andExpect {
                     status { isBadRequest() }
                 }
@@ -168,29 +168,29 @@ internal class PatientControllerTest @Autowired constructor(
             cookie.path = "/api/"
             
             // when
-            val performPost = mockMvc.get(baseUrl) {
+            val performGet = mockMvc.get(baseUrl) {
                 contentType = MediaType.APPLICATION_JSON
                 cookie(cookie)
             }
             
             // then
-            performPost.andDo { print() }
+            performGet.andDo { print() }
                 .andExpect {
                     status { isOk() }
                 }
         }
 
         @Test
-        fun `should return BAD_REQUEST if there is no Patient in request`() {
+        fun `should return BAD_REQUEST if there is no Cookie in request`() {
             // given
 
 
             // when
-            val performPost = mockMvc.get(baseUrl) {
+            val performGet = mockMvc.get(baseUrl) {
                 contentType = MediaType.APPLICATION_JSON
                 }
             // then
-                performPost.andDo { print() }
+            performGet.andDo { print() }
                     .andExpect {
                         status { isBadRequest() }
                     }

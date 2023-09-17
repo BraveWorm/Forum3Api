@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 import java.util.*
@@ -124,14 +125,14 @@ internal class MentalHealthProfessionalControllerTest @Autowired constructor(
              val expectedJson = "{\"isCreated\": true}"
 
              // when
-             val performPost = mockMvc.put(baseUrl) {
+             val performPut = mockMvc.put(baseUrl) {
                  contentType = MediaType.APPLICATION_JSON
                  content = objectMapper.writeValueAsString(newMentalHealthProfessionalDTO)
                  cookie(cookie)
              }
              
              // then
-             performPost.andDo { print() }
+             performPut.andDo { print() }
                  .andExpect {
                      status { isOk() }
                      content { json(expectedJson) }
@@ -147,9 +148,53 @@ internal class MentalHealthProfessionalControllerTest @Autowired constructor(
             cookie.path = "/api/"
 
             // when
-            val performPost = mockMvc.put(baseUrl) {
+            val performPut = mockMvc.put(baseUrl) {
                 contentType = MediaType.APPLICATION_JSON
                 cookie(cookie)
+            }
+
+            // then
+            performPut.andDo { print() }
+                .andExpect {
+                    status { isBadRequest() }
+                }
+        }
+    }
+    
+    @Nested
+    @DisplayName("GET api/mentalHealthProfessional")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class GetMentalHealthProfessional {
+        @Test
+        fun `should get MentalHealthProfessional and return status OK`() {
+            // given
+            // creating cookie/logging in
+            val cookie = createJWT("4")
+            cookie.isHttpOnly = true
+            cookie.path = "/api/"
+            
+            // when
+            val performGet = mockMvc.get(baseUrl) {
+                contentType = MediaType.APPLICATION_JSON
+                cookie(cookie)
+            }
+            
+            // then
+            performGet.andDo { print() }
+                .andExpect {
+                    status { isOk() }
+                }
+
+        }
+
+        @Test
+        fun `should return BAD_REQUEST if there is no Cookie in request`() {
+            // given
+
+
+            // when
+            val performPost = mockMvc.get(baseUrl) {
+                contentType = MediaType.APPLICATION_JSON
             }
 
             // then
@@ -158,6 +203,46 @@ internal class MentalHealthProfessionalControllerTest @Autowired constructor(
                     status { isBadRequest() }
                 }
         }
+    }
+
+    @Nested
+    @DisplayName("GET api/mentalHealthProfessional/{userId}")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class GetMentalHealthProfessionalByUserId {
+        @Test
+        fun `should should get MentalHealthProfessional by userId and return status OK`() {
+            // given
+            val userId="4"
+
+            // when
+            val performGet = mockMvc.get("$baseUrl/$userId") {
+                contentType = MediaType.APPLICATION_JSON
+            }
+
+            // then
+            performGet.andDo { print() }
+                .andExpect {
+                    status { isOk() }
+                }
+        }
+
+        @Test
+        fun `should should return BadRequest if there userId = null`() {
+            // given
+            val userId=null
+
+            // when
+            val performGet = mockMvc.get("$baseUrl/$userId") {
+                contentType = MediaType.APPLICATION_JSON
+            }
+
+            // then
+            performGet.andDo { print() }
+                .andExpect {
+                    status { isBadRequest() }
+                }
+        }
+
     }
 
 
